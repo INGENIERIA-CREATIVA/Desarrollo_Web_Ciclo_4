@@ -1,95 +1,61 @@
 import React, { Fragment, useEffect } from 'react'
 import MetaData from './layout/MetaData'
-import {useDispatch} from 'react-redux'
+import {useDispatch, useSelector} from 'react-redux'
 import { getProducts } from '../actions/productActions'
+import { Link} from 'react-router-dom'
+import { useAlert } from 'react-alert'
 
 export const Home = () => {
+    const { loading, productos, error} = useSelector(state=> state.products)
+    const alert= useAlert();
+
     const dispatch = useDispatch();
     useEffect(() => {
+        if (error){
+            return alert.error(error)
+        }
+
+
         dispatch(getProducts());
+        alert.success("OK")
     }, [dispatch])
   
     return (
     <Fragment>
-        <MetaData title={"Tienda expecializada en Ropa"}></MetaData>
+        {loading ? <i className='fa fa-refresh fa-spin fa-3x fa-fw'></i> :(
+            <Fragment>
+                        <MetaData title={"Tienda expecializada en Ropa"}></MetaData>
         <h1 id="encabezado_productos">Ultimos Productos</h1>
 
         <section id="productos" className='container mt-5'>
             <div className='row'>
-                {/* Producto1 */}
-                <div className='col-sm-12 col-md-6 col-lg-3 my-3'>
+                {productos && productos.map(producto => (
+                    <div key={producto._id} className='col-sm-12 col-md-6 col-lg-3 my-3'>
                     <div className='card p-3b rounded'>
-                        <img className='card-img-top mx-auto' src='./images/product1.jpg' alt='product1'></img>
+                        <img className='card-img-top mx-auto' src={producto.imagen[0].url} alt={producto.imagen[0].public_id}></img>
                         <div className='card-body d-flex flex-column'>
-                            <h5 id="titulo_producto"><a href='http://localhost:3000'>Camiseta tela Fria 1</a></h5>
+                            <h5 id="titulo_producto"><Link to={`/producto/${producto._id}`}>{producto.nombre}</Link></h5>
                             <div className='rating mt-auto'>
                                 <div className='rating-outer'>
-                                    <div className='rating-inner'></div>                                  
+                                    <div className='rating-inner' style={{width: `${(producto.calificacion/5)*100}%`}}></div>                                  
                                 </div>
-                                <span id="No_de_opiniones">5 reviews</span>
+                                <span id="No_de_opiniones">{producto.numCalificaciones} Reviews</span>
                             </div>
-                            <p className='card-text'>$72.000</p><a href='http://localhost:3000' id='view_btn' className='btn btn-block'>
+                            <p className='card-text'>${producto.precio}</p><Link to={`/producto/${producto._id}`} id='view_btn' className='btn btn-block'>
                                 Ver detalle
-                            </a> 
+                            </Link> 
                         </div>
                     </div>
                 </div>
-                {/* Producto2 */}
-                <div className='col-sm-12 col-md-6 col-lg-3 my-3'>
-                    <div className='card p-3b rounded'>
-                        <img className='card-img-top mx-auto' src='./images/product2.jpg' alt='product2'></img>
-                        <div className='card-body d-flex flex-column'>
-                            <h5 id="titulo_producto"><a href='http://localhost:3000'>Camiseta tela Fria 2</a></h5>
-                            <div className='rating mt-auto'>
-                                <div className='rating-outer'>
-                                    <div className='rating-inner'></div>                                  
-                                </div>
-                                <span id="No_de_opiniones">5 reviews</span>
-                            </div>
-                            <p className='card-text'>$72.000</p><a href='http://localhost:3000' id='view_btn' className='btn btn-block'>
-                                Ver detalle
-                            </a> 
-                        </div>
-                    </div>
-                </div>
-                {/* Producto3 */}
-                <div className='col-sm-12 col-md-6 col-lg-3 my-3'>
-                    <div className='card p-3b rounded'>
-                        <img className='card-img-top mx-auto' src='./images/product3.jpg' alt='product3'></img>
-                        <div className='card-body d-flex flex-column'>
-                            <h5 id="titulo_producto"><a href='http://localhost:3000'>Camiseta tela Fria 3</a></h5>
-                            <div className='rating mt-auto'>
-                                <div className='rating-outer'>
-                                    <div className='rating-inner'></div>                                  
-                                </div>
-                                <span id="No_de_opiniones">5 reviews</span>
-                            </div>
-                            <p className='card-text'>$72.000</p><a href='http://localhost:3000' id='view_btn' className='btn btn-block'>
-                                Ver detalle
-                            </a> 
-                        </div>
-                    </div>
-                </div>
-                {/* Producto4 */}
-                <div className='col-sm-12 col-md-6 col-lg-3 my-3'>
-                    <div className='card p-3b rounded'>
-                        <img className='card-img-top mx-auto' src='./images/product4.jpg' alt='product4'></img>
-                        <div className='card-body d-flex flex-column'>
-                            <h5 id="titulo_producto"><a href='http://localhost:3000'>Camiseta tela Fria 4</a></h5>
-                            <div className='rating mt-auto'>
-                                <div className='rating-outer'>
-                                    <div className='rating-inner'></div>                                  
-                                </div>
-                                <span id="No_de_opiniones">5 reviews</span>
-                            </div>
-                            <p className='card-text'>$72.000</p><a href='http://localhost:3000' id='view_btn' className='btn btn-block'>
-                                Ver detalle
-                            </a> 
-                        </div>
-                    </div>
-                </div>
+
+                ))}
+                
             </div>
         </section>
+            </Fragment>
+
+        )}
+
     </Fragment>
   )
 }
